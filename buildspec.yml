@@ -18,17 +18,13 @@ phases:
   build:
     commands:
       - echo "Build phase: Running OWASP Dependency-Check analysis..."
-      # Cria o diretório para os relatórios
       - mkdir -p reports
-      # Atualiza o PATH para incluir a pasta do Dependency-Check
       - export PATH=$PATH:$(pwd)/dependency-check/bin
-      # Executa a análise; ajuste "meu-projeto" conforme necessário
       - dependency-check.sh --project "meu-projeto" --scan . --format HTML --out reports/
   post_build:
     commands:
       - echo "Build completed on $(date)"
       - echo "Uploading Dependency-Check reports to S3..."
-      # Substitua 'meu-bucket-de-relatorios' pelo nome do seu bucket S3
       - aws s3 cp reports/ s3://meu-bucket-de-relatorios/ --recursive
 
 artifacts:
