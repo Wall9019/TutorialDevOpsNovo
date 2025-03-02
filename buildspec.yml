@@ -8,22 +8,27 @@ phases:
     commands:
       - echo "Installing NPM dependencies..."
       - npm install
-      - echo "Installing OWASP Dependency-Check..."
+      - echo "Downloading OWASP Dependency-Check..."
       - curl -sLO https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip
+      - echo "Unzipping Dependency-Check..."
       - unzip dependency-check-9.0.9-release.zip
-      - export PATH=$PATH:$(pwd)/dependency-check/bin
   pre_build:
     commands:
       - echo "Pre-build phase"
   build:
     commands:
-      - echo "Build phase"
-      - echo "Running OWASP Dependency-Check analysis..."
+      - echo "Build phase: Running OWASP Dependency-Check analysis..."
+      # Cria o diretório para os relatórios
+      - mkdir -p reports
+      # Atualiza o PATH para incluir a pasta do Dependency-Check
+      - export PATH=$PATH:$(pwd)/dependency-check/bin
+      # Executa a análise; ajuste "meu-projeto" conforme necessário
       - dependency-check.sh --project "meu-projeto" --scan . --format HTML --out reports/
   post_build:
     commands:
-      - echo "Build completed on `date`"
+      - echo "Build completed on $(date)"
       - echo "Uploading Dependency-Check reports to S3..."
+      # Substitua 'meu-bucket-de-relatorios' pelo nome do seu bucket S3
       - aws s3 cp reports/ s3://meu-bucket-de-relatorios/ --recursive
 
 artifacts:
